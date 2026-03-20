@@ -1,0 +1,52 @@
+{
+  "title": "Qwen3-TTS",
+  "description": "Voice cloning TTS with Qwen3-TTS — Fast inference on RunPod Serverless with CUDA graph acceleration",
+  "type": "serverless",
+  "category": "audio",
+  "iconUrl": "https://cdn-icons-png.flaticon.com/512/1050/1050626.png",
+
+  "config": {
+    "runsOn": "GPU",
+    "endpointType": "LB",
+    "containerDiskInGb": 20,
+
+    "gpuCount": 1,
+    "gpuIds": "RTX 4090,RTX 3090,RTX 4080,ADA_24,A100_80GB,A6000_48GB,A5000_24GB,A4000_16GB,A100_40GB",
+    "allowedCudaVersions": ["12.8", "12.6", "12.4"],
+
+    "env": [
+      {
+        "key": "VOICE_MAP_URL",
+        "input": {
+          "name": "Voice Map URL",
+          "type": "string",
+          "description": "URL to a JSON voicemap file. See README for format.",
+          "default": "",
+          "advanced": false
+        }
+      },
+      {
+        "key": "USE_CACHED_MODEL",
+        "input": {
+          "type": "boolean",
+          "name": "Use RunPod Cached Model",
+          "description": "Load model from RunPod's cached model store. Set 'Model' field on endpoint to Qwen/Qwen3-TTS-12Hz-1.7B-Base to enable.",
+          "default": false,
+          "trueValue": "1",
+          "falseValue": "0"
+        }
+      },
+      {
+        "key": "USE_NETWORK_VOLUME",
+        "input": {
+          "type": "boolean",
+          "name": "Use Network Volume for Cache",
+          "description": "Store HuggingFace cache on network volume instead of container disk.",
+          "default": false,
+          "trueValue": "1",
+          "falseValue": "0"
+        }
+      }
+    ]
+  }
+}
