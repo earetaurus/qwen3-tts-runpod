@@ -1,6 +1,10 @@
 # Qwen3-TTS RunPod Serverless Worker
 
+[![Runpod](https://api.runpod.io/badge/earetaurus/qwen3-tts-runpod)](https://console.runpod.io/hub/earetaurus/qwen3-tts-runpod)
+
 > **This project is ~80% vibe coded.** Built rapidly with heavy AI assistance. Use at your own discretion.
+
+> If this project is useful to you, please consider using [my RunPod referral link](https://runpod.io?ref=akghcny7) to support the infrastructure costs.
 
 ## Acknowledgements
 
