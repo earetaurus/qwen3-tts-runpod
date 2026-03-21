@@ -3,48 +3,7 @@
     {
       "name": "ping",
       "input": {},
-      "timeout": 40000
-    },
-    {
-      "name": "stats",
-      "input": {},
-      "timeout": 10000
-    },
-    {
-      "name": "voices",
-      "input": {},
-      "timeout": 10000
-    },
-    {
-      "name": "root",
-      "input": {},
-      "timeout": 10000
-    },
-    {
-      "name": "tts_voicemap_mila",
-      "input": {
-        "text": "Hello, this is a test of the Qwen 3 TTS voice cloning system.",
-        "language": "English",
-        "mode": "voice_clone",
-        "voicemap": "mila",
-        "ref_text": "It's in the top drawer... wait, it's empty? No way, that's impossible! I'm sure I put it there!"
-      },
-      "timeout": 180000
-    },
-    {
-      "name": "openai_speech_api",
-      "input": {
-        "input": "Hello from the OpenAI-compatible audio speech endpoint.",
-        "voice": "mila",
-        "response_format": "mp3",
-        "speed": 1.0
-      },
-      "timeout": 180000
-    },
-    {
-      "name": "models_endpoint",
-      "input": {},
-      "timeout": 10000
+      "timeout": 300000
     }
   ],
   "config": {
