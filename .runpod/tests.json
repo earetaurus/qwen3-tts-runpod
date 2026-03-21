@@ -1,10 +1,8 @@
 {
   "tests": [
     {
-      "name": "test",
-      "input": {
-        "text": "Hello, World!"
-      },
+      "name": "ping",
+      "input": {},
       "timeout": 40000
     }
   ],
