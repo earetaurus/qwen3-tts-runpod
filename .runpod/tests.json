@@ -20,8 +20,24 @@
     "gpuCount": 1,
     "env": [
       {
+        "key": "PORT",
+        "value": "5000"
+      },
+      {
         "key": "VOICE_MAP_URL",
         "value": "https://raw.githubusercontent.com/earetaurus/qwen3-tts-runpod/main/voicemap/voicemap.json"
+      },
+      {
+        "key": "USE_CACHED_MODEL",
+        "value": "0"
+      },
+      {
+        "key": "MODEL_TYPE",
+        "value": "base"
+      },
+      {
+        "key": "MODEL_SIZE",
+        "value": "1.7b"
       }
     ],
     "allowedCudaVersions": ["12.7", "12.6"]
