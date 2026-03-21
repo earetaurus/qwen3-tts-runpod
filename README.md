@@ -12,6 +12,7 @@ This project stands on the shoulders of giants:
 
 - **[Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)** by Qwen Team (Alibaba) — the underlying TTS model
 - **[faster-qwen3-tts](https://github.com/andimarafioti/faster-qwen3-tts)** by [@andimarafioti](https://github.com/andimarafioti) — CUDA graph acceleration for fast inference
+- **[Qwen3-TTS-Openai-Fastapi](https://github.com/groxaxo/Qwen3-TTS-Openai-Fastapi)** by [@groxaxo](https://github.com/groxaxo) — inspiration for TF32, cuDNN benchmark, and speaker embedding caching optimizations
 - **Icons by [Flaticon](https://www.flaticon.com/uicons)**
 
 ## Features
@@ -22,7 +23,8 @@ This project stands on the shoulders of giants:
 - OpenAI-compatible `/v1/audio/speech` endpoint (SillyTavern compatible)
 - Streaming audio output
 - Fast cold starts with RunPod cached models (serverless)
-- Lazy voice loading
+- Speaker embedding caching — extracted once, reused for every request
+- GPU optimizations: TF32, cuDNN benchmark, BFloat16 mixed precision
 
 ## Quick Start
 
