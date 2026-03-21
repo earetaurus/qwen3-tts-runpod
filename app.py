@@ -62,8 +62,7 @@ def _download_and_cache_voice(name: str, url: str, ref_text: str) -> bool:
         import hashlib
 
         digest = hashlib.sha1(content).hexdigest()
-        tmp_dir = Path(tempfile.gettempdir())
-        path = tmp_dir / f"qwen3_voice_{digest}.wav"
+        path = VOICE_CACHE_DIR / f"qwen3_voice_{digest}.wav"
         if not path.exists():
             path.write_bytes(content)
         _voice_cache[name] = {"path": str(path), "ref_text": ref_text}
@@ -89,12 +88,25 @@ def _ensure_voice_cached(name: str) -> dict:
     return _voice_cache[name]
 
 
+_pod_mode = os.getenv("POD_MODE", "0") == "1"
+_workspace = Path("/workspace")
 _use_network_volume = os.getenv("USE_NETWORK_VOLUME", "0") == "1"
-HF_HOME = Path("/runpod-volume/.hf_home" if _use_network_volume else "/tmp/.hf_home")
+HF_HOME = (
+    _workspace / ".hf_home"
+    if _pod_mode
+    else (
+        Path("/runpod-volume/.hf_home")
+        if _use_network_volume
+        else Path("/tmp/.hf_home")
+    )
+)
 HF_HOME.mkdir(parents=True, exist_ok=True)
 MODEL_LOCK = HF_HOME / ".download.lock"
+VOICE_CACHE_DIR = _workspace / "voices"
+VOICE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 _use_cached_model = os.getenv("USE_CACHED_MODEL", "0") == "1"
+_WARMUP_RUNS = int(os.getenv("WARMUP_RUNS", "3"))
 HF_CACHE_ROOT = "/runpod-volume/huggingface-cache/hub"
 MODEL_NAME = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
 
@@ -160,6 +172,18 @@ def _release_model_lock():
 async def startup_event():
     global _model, _model_loaded
     _load_voice_map()
+
+    if _pod_mode:
+        print(f"POD_MODE enabled — pre-downloading voices to {VOICE_CACHE_DIR}...")
+        for name, data in _voice_map.items():
+            try:
+                _download_and_cache_voice(
+                    name, data.get("url", data), data.get("ref_text", "")
+                )
+            except Exception:
+                pass
+        print(f"  -> {len(_voice_cache)} voices cached")
+
     try:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"Loading FasterQwen3TTS model on {device}...")
@@ -183,8 +207,8 @@ async def startup_event():
         finally:
             _release_model_lock()
 
-        print("Capturing CUDA graphs...")
-        _model._warmup(prefill_len=8)
+        print(f"Capturing CUDA graphs ({_WARMUP_RUNS} warmup runs)...")
+        _model._warmup(prefill_len=8, warmup_iters=_WARMUP_RUNS)
         _model_loaded = True
         print("Model ready!")
     except Exception as e:

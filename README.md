@@ -1,4 +1,4 @@
-# Qwen3-TTS RunPod Serverless Worker
+# Qwen3-TTS RunPod Worker
 
 [![Runpod](https://api.runpod.io/badge/earetaurus/qwen3-tts-runpod)](https://console.runpod.io/hub/earetaurus/qwen3-tts-runpod)
 
@@ -16,12 +16,12 @@ This project stands on the shoulders of giants:
 
 ## Features
 
-- RunPod Serverless load balancing worker
-- Voice cloning via reference audio
+- Works on **RunPod Serverless** and **Dedicated Pods**
+- Voice cloning via reference audio (~5 GB VRAM needed)
 - Voicemap support — pre-download voices from a JSON URL
 - OpenAI-compatible `/v1/audio/speech` endpoint (SillyTavern compatible)
 - Streaming audio output
-- Fast cold starts with RunPod cached models
+- Fast cold starts with RunPod cached models (serverless)
 - Lazy voice loading
 
 ## Quick Start
@@ -45,9 +45,12 @@ docker push your-docker-hub/runpod-qwen3-tts:latest
 
 | Variable | Default | Description |
 |---|---|---|
+| `PORT` | `5000` | HTTP server port |
 | `VOICE_MAP_URL` | — | URL to a JSON voicemap (see format below) |
 | `USE_CACHED_MODEL` | `0` | Set to `1` to load model from `/runpod-volume/huggingface-cache/` |
 | `USE_NETWORK_VOLUME` | `0` | Set to `1` to store HF cache on network volume |
+| `POD_MODE` | `0` | Set to `1` for dedicated Pod — stores model/voices in `/workspace`, pre-downloads voicemap |
+| `WARMUP_RUNS` | `3` | Number of warmup runs for CUDA graph capture |
 
 #### Voicemap Format
 
@@ -151,6 +154,37 @@ Root endpoint — returns status message.
 docker build -t your-docker-hub/runpod-qwen3-tts:latest ./public
 docker push your-docker-hub/runpod-qwen3-tts:latest
 ```
+
+## Dedicated Pod Deployment
+
+The container also runs on RunPod **Dedicated Pods** (GPU persistent, no cold starts).
+
+**Requirements:**
+- **~5 GB VRAM** (tested on RTX 4090, should work on any 8GB+ GPU)
+- Ubuntu 22.04 or similar Linux
+- CUDA 12.6+ compatible drivers
+
+**Setup:**
+1. Create a Pod with a CUDA-capable template (e.g. `Ubuntu 22.04 CUDA 12.6`)
+2. Expose port `5000` (or set `PORT` env var)
+3. Pull and run the container:
+   ```bash
+   docker run -d --gpus all \
+     -p 5000:5000 \
+     -e PORT=5000 \
+     -e VOICE_MAP_URL=https://your-voicemap.json \
+     -e POD_MODE=1 \
+     -e WARMUP_RUNS=3 \
+     -v qwen3-workspace:/workspace \
+     --name qwen3-tts \
+     your-docker-hub/runpod-qwen3-tts:latest
+   ```
+4. Access at `http://<pod-ip>:5000`
+
+**Notes:**
+- Set `POD_MODE=1` to store model cache and voices in `/workspace` (use a volume mount for persistence)
+- `WARMUP_RUNS` controls CUDA graph warmup iterations (serverless only — ignored on Pods after first run)
+- The container downloads the ~4GB model on first start
 
 ## License
 
