@@ -13,6 +13,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cu126 torch torchaudio
 RUN pip install --no-cache-dir numpy>=1.26.0
 RUN pip install --no-cache-dir "faster-qwen3-tts"
+RUN pip install --no-cache-dir flash-attn --no-build-isolation
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app.py .
