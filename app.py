@@ -36,7 +36,6 @@ _voice_cache = {}
 
 MAX_TEXT_CHARS = 5000
 
-_force_runpod_test = os.getenv("FORCE_RUNPOD_TEST", "0") == "1"
 _use_cached_model = os.getenv("USE_CACHED_MODEL", "0") == "1"
 HF_CACHE_ROOT = "/runpod-volume/huggingface-cache/hub"
 
@@ -186,12 +185,6 @@ def _release_model_lock():
 @app.on_event("startup")
 async def startup_event():
     global _model, _model_loaded
-
-    if _force_runpod_test:
-        print("FORCE_RUNPOD_TEST mode — skipping model and voice loading")
-        _model_loaded = True
-        return
-
     _load_voice_map()
 
     if _pod_mode:
@@ -243,8 +236,6 @@ async def startup_event():
 
 @app.get("/ping")
 def health_check():
-    if _force_runpod_test:
-        return JSONResponse(status_code=200, content={"status": "ok"})
     if not _model_loaded:
         return JSONResponse(status_code=204, content={"status": "initializing"})
     return JSONResponse(status_code=200, content={"status": "healthy"})
@@ -262,14 +253,6 @@ async def generate_tts(
     ref_audio: UploadFile = File(None),
     ref_url: str = Form(""),
 ):
-    if _force_runpod_test:
-        return JSONResponse(
-            status_code=200,
-            content={
-                "audio_b64": "",
-                "metrics": {"rtf": 0.0, "total_ms": 0, "audio_duration_s": 0},
-            },
-        )
     global _model
     if not _model or not _model_loaded:
         raise HTTPException(status_code=503, detail="Model not loaded yet")
@@ -451,21 +434,6 @@ def _wav_to_mp3(wav_bytes: bytes, speed: float = 1.0) -> bytes:
 
 @app.get("/v1/models")
 async def list_models():
-    if _force_runpod_test:
-        return JSONResponse(
-            status_code=200,
-            content={
-                "object": "list",
-                "data": [
-                    {
-                        "id": "qwen3-tts",
-                        "object": "model",
-                        "created": 1700000000,
-                        "owned_by": "qwen",
-                    }
-                ],
-            },
-        )
     return {
         "object": "list",
         "data": [
@@ -481,8 +449,6 @@ async def list_models():
 
 @app.post("/v1/audio/speech")
 async def openai_speech(body: dict = Body(...)):
-    if _force_runpod_test:
-        return JSONResponse(status_code=200, content={"ok": "FORCE_RUNPOD_TEST mode"})
     if not _model or not _model_loaded:
         raise HTTPException(status_code=503, detail="Model not loaded yet")
 
@@ -542,10 +508,6 @@ async def openai_speech(body: dict = Body(...)):
 
 @app.get("/voices")
 async def get_voices():
-    if _force_runpod_test:
-        return JSONResponse(
-            status_code=200, content={"voicemaps": [], "speakers": [], "languages": []}
-        )
     voicemaps = list(_voice_map.keys())
     try:
         speakers = _model.get_supported_speakers() if _model else []
@@ -557,8 +519,6 @@ async def get_voices():
 
 @app.get("/stats")
 async def stats():
-    if _force_runpod_test:
-        return JSONResponse(status_code=200, content={"mode": "FORCE_RUNPOD_TEST"})
     return {
         "model_loaded": _model_loaded,
         "cuda_available": torch.cuda.is_available(),
@@ -570,8 +530,6 @@ async def stats():
 
 @app.get("/")
 async def root():
-    if _force_runpod_test:
-        return JSONResponse(status_code=200, content={"mode": "FORCE_RUNPOD_TEST"})
     datacenter_id = os.getenv("RUNPOD_DC_ID")
     return {
         "message": f"Qwen 3 TTS Worker - {datacenter_id if datacenter_id else 'Ready'}".strip()
