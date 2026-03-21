@@ -11,7 +11,7 @@
     "containerDiskInGb": 20,
 
     "gpuCount": 1,
-    "gpuIds": "RTX 4000 Ada,RTX A4500,RTX 2000 Ada",
+    "gpuIds": "AMPERE_16",
     "allowedCudaVersions": ["12.6"],
 
     "env": [
