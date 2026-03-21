@@ -36,7 +36,6 @@ _voice_cache = {}
 
 MAX_TEXT_CHARS = 5000
 
-_speaker_embedding_cache = {}
 _use_cached_model = os.getenv("USE_CACHED_MODEL", "0") == "1"
 HF_CACHE_ROOT = "/runpod-volume/huggingface-cache/hub"
 
@@ -110,24 +109,6 @@ def _ensure_voice_cached(name: str) -> dict:
         raise KeyError(name)
     _download_and_cache_voice(name, url, ref_text)
     return _voice_cache[name]
-
-
-def _get_speaker_embedding(name: str) -> list:
-    if name in _speaker_embedding_cache:
-        return _speaker_embedding_cache[name]
-    if not _model:
-        raise RuntimeError("Model not loaded")
-    voice = _ensure_voice_cached(name)
-    ref_path = voice["path"]
-    ref_text = voice.get("ref_text", "")
-    print(f"Extracting speaker embedding for '{name}'...")
-    prompt = _model.model.create_voice_clone_prompt(
-        ref_audio=ref_path,
-        ref_text=ref_text,
-        x_vector_only_mode=True,
-    )
-    _speaker_embedding_cache[name] = prompt
-    return prompt
 
 
 _pod_mode = os.getenv("POD_MODE", "0") == "1"
@@ -245,15 +226,6 @@ async def startup_event():
         _model_loaded = True
         print("Model ready!")
 
-        if _pod_mode and _voice_map and _MODEL_TYPE == "base":
-            print(f"Pre-warming speaker embeddings for {len(_voice_map)} voices...")
-            for name in _voice_map:
-                try:
-                    _get_speaker_embedding(name)
-                    print(f"  -> cached embedding for '{name}'")
-                except Exception as e:
-                    print(f"  -> failed to cache '{name}': {e}")
-            print(f"  -> {len(_speaker_embedding_cache)} speaker embeddings cached")
     except Exception as e:
         import traceback
 
@@ -340,19 +312,12 @@ async def generate_tts(
                 status_code=400,
                 detail="voice_clone mode requires ref_audio (or voicemap) and ref_text",
             )
-        if voicemap:
-            audio_list, sr = _model.generate_voice_clone(
-                text=text,
-                language=language,
-                voice_clone_prompt=_get_speaker_embedding(voicemap),
-            )
-        else:
-            audio_list, sr = _model.generate_voice_clone(
-                text=text,
-                language=language,
-                ref_audio=ref_path,
-                ref_text=resolved_ref_text,
-            )
+        audio_list, sr = _model.generate_voice_clone(
+            text=text,
+            language=language,
+            ref_audio=ref_path,
+            ref_text=resolved_ref_text,
+        )
     elif mode == "custom":
         if _MODEL_TYPE != "customvoice":
             raise HTTPException(
@@ -512,7 +477,8 @@ async def openai_speech(body: dict = Body(...)):
     audio_list, sr = _model.generate_voice_clone(
         text=input_text,
         language="English",
-        voice_clone_prompt=_get_speaker_embedding(voice),
+        ref_audio=ref_path,
+        ref_text=ref_text,
     )
 
     if response_format == "mp3":

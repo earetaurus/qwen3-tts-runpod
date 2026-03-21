@@ -12,21 +12,20 @@ This project stands on the shoulders of giants:
 
 - **[Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)** by Qwen Team (Alibaba) — the underlying TTS model
 - **[faster-qwen3-tts](https://github.com/andimarafioti/faster-qwen3-tts)** by [@andimarafioti](https://github.com/andimarafioti) — CUDA graph acceleration for fast inference
-- **[Qwen3-TTS-Openai-Fastapi](https://github.com/groxaxo/Qwen3-TTS-Openai-Fastapi)** by [@groxaxo](https://github.com/groxaxo) — inspiration for TF32, cuDNN benchmark, and speaker embedding caching optimizations
 - **Icons by [Flaticon](https://www.flaticon.com/uicons)**
 
 ## Features
 
 - Works on **RunPod Serverless** and **Dedicated Pods**
 - Three model types via `MODEL_TYPE` env: `base` (voice clone), `customvoice` (preset voices + instruct), `voicedesign` (text-to-voice)
-- Two model sizes via `MODEL_SIZE` env: `1.7b` (default, better quality) or `0.6b` (faster, less VRAM)
+- Two model sizes via `MODEL_SIZE` env: `1.7b` (default) or `0.6b`
 - Voice cloning via reference audio (~5 GB VRAM needed)
 - Voicemap support — pre-download voices from a JSON URL
 - OpenAI-compatible `/v1/audio/speech` endpoint (SillyTavern compatible)
 - Streaming audio output
 - Fast cold starts with RunPod cached models (serverless)
-- Speaker embedding caching — extracted once, reused for every request
-- GPU optimizations: TF32, cuDNN benchmark, BFloat16 mixed precision
+- GPU speed optimizations: TF32, cuDNN benchmark (handled by faster-qwen3-tts)
+
 
 ## Quick Start
 
