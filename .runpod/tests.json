@@ -7,7 +7,7 @@
     }
   ],
   "config": {
-    "gpuTypeId": "NVIDIA RTX 4000 Ada",
+    "gpuTypeId": "AMPERE_16",
     "gpuCount": 1,
     "allowedCudaVersions": ["12.6"]
   }
