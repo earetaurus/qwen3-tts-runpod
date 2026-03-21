@@ -1,8 +1,21 @@
 {
   "tests": [
     {
-      "name": "health_check",
-      "input": {},
+      "name": "openai_compatible_tts",
+      "input": {
+        "path": "/v1/audio/speech",
+        "method": "POST",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "model": "qwen3-tts",
+          "input": "Hello world!",
+          "voice": "voice_one",
+          "response_format": "mp3",
+          "speed": 1.0
+        }
+      },
       "timeout": 300000
     }
   ],
