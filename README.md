@@ -50,7 +50,6 @@ docker push your-docker-hub/runpod-qwen3-tts:latest
 | `USE_CACHED_MODEL` | `0` | Set to `1` to load model from `/runpod-volume/huggingface-cache/` |
 | `USE_NETWORK_VOLUME` | `0` | Set to `1` to store HF cache on network volume |
 | `POD_MODE` | `0` | Set to `1` for dedicated Pod — stores model/voices in `/workspace`, pre-downloads voicemap |
-| `WARMUP_RUNS` | `3` | Number of warmup runs for CUDA graph capture |
 
 #### Voicemap Format
 
@@ -174,7 +173,6 @@ The container also runs on RunPod **Dedicated Pods** (GPU persistent, no cold st
      -e PORT=5000 \
      -e VOICE_MAP_URL=https://your-voicemap.json \
      -e POD_MODE=1 \
-     -e WARMUP_RUNS=3 \
      -v qwen3-workspace:/workspace \
      --name qwen3-tts \
      your-docker-hub/runpod-qwen3-tts:latest
@@ -183,7 +181,6 @@ The container also runs on RunPod **Dedicated Pods** (GPU persistent, no cold st
 
 **Notes:**
 - Set `POD_MODE=1` to store model cache and voices in `/workspace` (use a volume mount for persistence)
-- `WARMUP_RUNS` controls CUDA graph warmup iterations (serverless only — ignored on Pods after first run)
 - The container downloads the ~4GB model on first start
 
 ## License

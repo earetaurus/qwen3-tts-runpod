@@ -106,7 +106,6 @@ VOICE_CACHE_DIR = _workspace / "voices"
 VOICE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 _use_cached_model = os.getenv("USE_CACHED_MODEL", "0") == "1"
-_WARMUP_RUNS = int(os.getenv("WARMUP_RUNS", "3"))
 HF_CACHE_ROOT = "/runpod-volume/huggingface-cache/hub"
 MODEL_NAME = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
 
@@ -207,8 +206,8 @@ async def startup_event():
         finally:
             _release_model_lock()
 
-        print(f"Capturing CUDA graphs ({_WARMUP_RUNS} warmup runs)...")
-        _model._warmup(prefill_len=8, warmup_iters=_WARMUP_RUNS)
+        print("Capturing CUDA graphs...")
+        _model._warmup(prefill_len=8)
         _model_loaded = True
         print("Model ready!")
     except Exception as e:
