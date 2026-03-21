@@ -7,7 +7,6 @@
 
   "config": {
     "runsOn": "GPU",
-    "endpointType": "LB",
     "containerDiskInGb": 20,
 
     "gpuCount": 1,
@@ -15,6 +14,16 @@
     "allowedCudaVersions": ["12.8", "12.6", "12.4"],
 
     "env": [
+      {
+        "key": "MODEL_NAME",
+        "input": {
+          "type": "huggingface",
+          "name": "HuggingFace Model",
+          "description": "Model to use for TTS. Default recommended for best performance.",
+          "default": "Qwen/Qwen3-TTS-12Hz-1.7B-Base",
+          "required": true
+        }
+      },
       {
         "key": "VOICE_MAP_URL",
         "input": {
@@ -30,7 +39,7 @@
         "input": {
           "type": "boolean",
           "name": "Use RunPod Cached Model",
-          "description": "Load model from RunPod's cached model store. Set 'Model' field on endpoint to Qwen/Qwen3-TTS-12Hz-1.7B-Base to enable.",
+          "description": "Load model from RunPod's cached model store for faster cold starts. Enable this and ensure the Model field is set above.",
           "default": false,
           "trueValue": "1",
           "falseValue": "0"
