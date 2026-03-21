@@ -1,14 +1,15 @@
 {
   "tests": [
     {
-      "name": "health_check",
-      "input": {},
-      "timeout": 120000
+      "name": "test",
+      "input": {
+        "text": "Hello, World!"
+      },
+      "timeout": 40000
     }
   ],
   "config": {
     "gpuTypeId": "NVIDIA GeForce RTX 4090",
-    "gpuCount": 1,
-    "allowedCudaVersions": ["12.6"]
+    "gpuCount": 1
   }
 }
