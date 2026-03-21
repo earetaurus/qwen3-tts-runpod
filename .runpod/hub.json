@@ -11,8 +11,8 @@
     "containerDiskInGb": 20,
 
     "gpuCount": 1,
-    "gpuIds": "RTX 3090,RTX 4080,A5000_24GB,A4000_16GB",
-    "allowedCudaVersions": ["12.8", "12.6", "12.4"],
+    "gpuIds": "RTX 4000 Ada,RTX A4500,RTX 2000 Ada",
+    "allowedCudaVersions": ["12.6"],
 
     "env": [
       {
