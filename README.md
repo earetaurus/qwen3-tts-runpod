@@ -18,6 +18,8 @@ This project stands on the shoulders of giants:
 ## Features
 
 - Works on **RunPod Serverless** and **Dedicated Pods**
+- Three model types via `MODEL_TYPE` env: `base` (voice clone), `customvoice` (preset voices + instruct), `voicedesign` (text-to-voice)
+- Two model sizes via `MODEL_SIZE` env: `1.7b` (default, better quality) or `0.6b` (faster, less VRAM)
 - Voice cloning via reference audio (~5 GB VRAM needed)
 - Voicemap support — pre-download voices from a JSON URL
 - OpenAI-compatible `/v1/audio/speech` endpoint (SillyTavern compatible)
@@ -52,6 +54,8 @@ docker push your-docker-hub/runpod-qwen3-tts:latest
 | `USE_CACHED_MODEL` | `0` | Set to `1` to load model from `/runpod-volume/huggingface-cache/` |
 | `USE_NETWORK_VOLUME` | `0` | Set to `1` to store HF cache on network volume |
 | `POD_MODE` | `0` | Set to `1` for dedicated Pod — stores model/voices in `/workspace`, pre-downloads voicemap |
+| `MODEL_TYPE` | `base` | Model variant: `base` (voice clone), `customvoice` (preset voices + instruct), `voicedesign` (text-to-voice) |
+| `MODEL_SIZE` | `1.7b` | Model size: `1.7b` or `0.6b` |
 
 #### Voicemap Format
 
@@ -175,6 +179,8 @@ The container also runs on RunPod **Dedicated Pods** (GPU persistent, no cold st
      -e PORT=5000 \
      -e VOICE_MAP_URL=https://your-voicemap.json \
      -e POD_MODE=1 \
+     -e MODEL_TYPE=base \
+    -e MODEL_SIZE=1.7b \
      -v qwen3-workspace:/workspace \
      --name qwen3-tts \
      your-docker-hub/runpod-qwen3-tts:latest

@@ -39,7 +39,15 @@ MAX_TEXT_CHARS = 5000
 _speaker_embedding_cache = {}
 _use_cached_model = os.getenv("USE_CACHED_MODEL", "0") == "1"
 HF_CACHE_ROOT = "/runpod-volume/huggingface-cache/hub"
-MODEL_NAME = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
+
+_MODEL_TYPE = os.getenv("MODEL_TYPE", "base").lower()
+_MODEL_SIZE = os.getenv("MODEL_SIZE", "1.7b").lower()
+_MODEL_IDS = {
+    "base": f"Qwen/Qwen3-TTS-12Hz-{_MODEL_SIZE}-Base",
+    "customvoice": f"Qwen/Qwen3-TTS-12Hz-{_MODEL_SIZE}-CustomVoice",
+    "voicedesign": f"Qwen/Qwen3-TTS-12Hz-{_MODEL_SIZE}-VoiceDesign",
+}
+MODEL_NAME = _MODEL_IDS.get(_MODEL_TYPE, f"Qwen/Qwen3-TTS-12Hz-{_MODEL_SIZE}-Base")
 
 if _use_cached_model:
     os.environ["HF_HUB_OFFLINE"] = "1"
@@ -211,7 +219,7 @@ async def startup_event():
 
     try:
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"Loading FasterQwen3TTS model on {device}...")
+        print(f"Loading FasterQwen3TTS {_MODEL_TYPE}/{_MODEL_SIZE} on {device}...")
 
         _acquire_model_lock()
         try:
@@ -237,7 +245,7 @@ async def startup_event():
         _model_loaded = True
         print("Model ready!")
 
-        if _pod_mode and _voice_map:
+        if _pod_mode and _voice_map and _MODEL_TYPE == "base":
             print(f"Pre-warming speaker embeddings for {len(_voice_map)} voices...")
             for name in _voice_map:
                 try:
@@ -322,6 +330,11 @@ async def generate_tts(
     t0 = time.perf_counter()
 
     if mode == "voice_clone":
+        if _MODEL_TYPE != "base":
+            raise HTTPException(
+                status_code=400,
+                detail="voice_clone mode requires MODEL_TYPE=base",
+            )
         if not ref_path or not resolved_ref_text:
             raise HTTPException(
                 status_code=400,
@@ -341,6 +354,11 @@ async def generate_tts(
                 ref_text=resolved_ref_text,
             )
     elif mode == "custom":
+        if _MODEL_TYPE != "customvoice":
+            raise HTTPException(
+                status_code=400,
+                detail="custom mode requires MODEL_TYPE=customvoice",
+            )
         if not speaker:
             raise HTTPException(
                 status_code=400, detail="speaker is required for custom mode"
@@ -352,6 +370,11 @@ async def generate_tts(
             instruct=instruct,
         )
     else:
+        if _MODEL_TYPE != "voicedesign":
+            raise HTTPException(
+                status_code=400,
+                detail="voice_design mode requires MODEL_TYPE=voicedesign",
+            )
         audio_list, sr = _model.generate_voice_design(
             text=text,
             instruct=instruct,
