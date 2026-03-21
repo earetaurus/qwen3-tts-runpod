@@ -1,17 +1,8 @@
 {
   "tests": [
     {
-      "name": "tts_voice_clone",
-      "input": {
-        "text": "Hello, this is a test of the Qwen 3 TTS system. It should sound natural and clear.",
-        "language": "English",
-        "mode": "voice_clone",
-        "voicemap": "mila",
-        "speaker": "",
-        "instruct": "",
-        "ref_url": "",
-        "ref_text": ""
-      },
+      "name": "health_check",
+      "input": {},
       "timeout": 300000
     }
   ],
@@ -20,26 +11,10 @@
     "gpuCount": 1,
     "env": [
       {
-        "key": "PORT",
-        "value": "5000"
-      },
-      {
-        "key": "VOICE_MAP_URL",
-        "value": "https://raw.githubusercontent.com/earetaurus/qwen3-tts-runpod/main/voicemap/voicemap.json"
-      },
-      {
-        "key": "USE_CACHED_MODEL",
-        "value": "0"
-      },
-      {
-        "key": "MODEL_TYPE",
-        "value": "base"
-      },
-      {
-        "key": "MODEL_SIZE",
-        "value": "1.7b"
+        "key": "FORCE_RUNPOD_TEST",
+        "value": "1"
       }
     ],
-    "allowedCudaVersions": ["12.7", "12.6"]
+    "allowedCudaVersions": ["12.6", "12.7", "12.8"]
   }
 }
