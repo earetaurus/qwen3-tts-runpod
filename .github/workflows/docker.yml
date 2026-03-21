@@ -49,7 +49,7 @@ jobs:
       - name: Build and push to GHCR
         uses: docker/build-push-action@v6
         with:
-          context: ./public
+          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -67,7 +67,7 @@ jobs:
         if: vars.DOCKERHUB_USERNAME != ''
         uses: docker/build-push-action@v6
         with:
-          context: ./public
+          context: .
           push: true
           tags: |
             earetaurus/runpod-qwen3-tts:latest
