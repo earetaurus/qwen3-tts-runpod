@@ -184,7 +184,7 @@ async def startup_event():
             _release_model_lock()
 
         print("Capturing CUDA graphs...")
-        _model._warmup(prefill_len=20)
+        _model._warmup(prefill_len=8)
         _model_loaded = True
         print("Model ready!")
     except Exception as e:
@@ -402,7 +402,7 @@ async def openai_speech(body: dict = Body(...)):
     voice = body.get("voice", "")
     response_format = body.get("response_format", "mp3")
     speed = float(body.get("speed", 1.0))
-    stream = body.get("stream", False)
+    stream = body.get("stream", True)
 
     if len(input_text) > MAX_TEXT_CHARS:
         raise HTTPException(
