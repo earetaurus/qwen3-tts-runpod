@@ -12,6 +12,7 @@ This project stands on the shoulders of giants:
 
 - **[Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)** by Qwen Team (Alibaba) — the underlying TTS model
 - **[faster-qwen3-tts](https://github.com/andimarafioti/faster-qwen3-tts)** by [@andimarafioti](https://github.com/andimarafioti) — CUDA graph acceleration for fast inference
+- **Icons by [Flaticon](https://www.flaticon.com/uicons)**
 
 ## Features
 
