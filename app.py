@@ -34,7 +34,7 @@ _model_loaded = False
 _voice_map = {}
 _voice_cache = {}
 
-MAX_TEXT_CHARS = 1000
+MAX_TEXT_CHARS = 5000
 
 
 def _load_voice_map():
